@@ -2,10 +2,11 @@
  * ItemBoard Component
  * 
  * Left side of the app containing:
- * - Waiting board (top)
- * - In Progress board (bottom) with Current box at top
+ * - Waiting board (left column, full height)
+ * - Current board (right column, top)
+ * - In Progress board (right column, bottom)
  * 
- * Supports drag-and-drop between boards and into Current.
+ * Supports drag-and-drop between boards.
  */
 
 import { useState } from 'react';
@@ -55,7 +56,7 @@ export function ItemBoard({
   return (
     <div className="item-board-area">
       <div className="boards-container">
-        {/* Waiting Board */}
+        {/* Left Column - Waiting Board */}
         <div className="board board--waiting">
           <div className="board__header">
             <span className="board__title">Waiting</span>
@@ -78,50 +79,56 @@ export function ItemBoard({
           </div>
         </div>
 
-        {/* In Progress Board */}
-        <div className="board board--in-progress">
-          <div className="board__header">
-            <span className="board__title">In Progress</span>
-            <span className="board__count">{inProgressItems.length + (currentItem ? 1 : 0)}</span>
-          </div>
-
-          {/* Current Box */}
+        {/* Right Column - Current + In Progress */}
+        <div className="boards-column">
+          {/* Current Board */}
           <div 
-            className={`current-box ${dragOverTarget === 'current' ? 'current-box--drag-over' : ''}`}
+            className={`board board--current ${dragOverTarget === 'current' ? 'board--drag-over' : ''}`}
             onDragOver={(e) => handleDragOver(e, 'current')}
             onDragLeave={handleDragLeave}
             onDrop={(e) => handleDrop(e, STATUSES.CURRENT)}
           >
-            <div className="current-box__label">Current</div>
-            {currentItem ? (
-              <ItemCard
-                item={enrichWithZone(currentItem)}
-                isSelected={currentItem.id === selectedItemId}
-                isCurrent
-                onClick={onItemClick}
-              />
-            ) : (
-              <div className="current-box__empty">
-                Drag an item here to set as current focus
-              </div>
-            )}
+            <div className="board__header">
+              <span className="board__title">Current</span>
+              <span className="board__count">{currentItem ? 1 : 0}</span>
+            </div>
+            <div className="board__items board__items--current">
+              {currentItem ? (
+                <ItemCard
+                  item={enrichWithZone(currentItem)}
+                  isSelected={currentItem.id === selectedItemId}
+                  isCurrent
+                  onClick={onItemClick}
+                />
+              ) : (
+                <div className="board__empty">
+                  Drag an item here to set as current focus
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* In Progress Items */}
-          <div 
-            className={`board__items ${dragOverTarget === 'in_progress' ? 'board__items--drag-over' : ''}`}
-            onDragOver={(e) => handleDragOver(e, 'in_progress')}
-            onDragLeave={handleDragLeave}
-            onDrop={(e) => handleDrop(e, STATUSES.IN_PROGRESS)}
-          >
-            {inProgressItems.map(item => (
-              <ItemCard
-                key={item.id}
-                item={enrichWithZone(item)}
-                isSelected={item.id === selectedItemId}
-                onClick={onItemClick}
-              />
-            ))}
+          {/* In Progress Board */}
+          <div className="board board--in-progress">
+            <div className="board__header">
+              <span className="board__title">In Progress</span>
+              <span className="board__count">{inProgressItems.length}</span>
+            </div>
+            <div 
+              className={`board__items ${dragOverTarget === 'in_progress' ? 'board__items--drag-over' : ''}`}
+              onDragOver={(e) => handleDragOver(e, 'in_progress')}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, STATUSES.IN_PROGRESS)}
+            >
+              {inProgressItems.map(item => (
+                <ItemCard
+                  key={item.id}
+                  item={enrichWithZone(item)}
+                  isSelected={item.id === selectedItemId}
+                  onClick={onItemClick}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
