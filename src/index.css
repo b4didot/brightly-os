@@ -268,7 +268,6 @@ body {
   padding: var(--space-md);
   flex: 1;
   min-height: 0;
-  overflow: hidden;
   border-radius: 8px;
 }
 
@@ -319,10 +318,13 @@ body {
   gap: var(--space-sm);
   overflow-y: auto;
   flex: 1;
+  min-height: 0;
+  padding: 2px;
 }
 
 .board__items--current {
   overflow: visible;
+  padding: 2px;
 }
 
 .board__empty {
