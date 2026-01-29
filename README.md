@@ -10,11 +10,9 @@ Instead of asking what should I do next, Brightly helps you answer a better ques
 
 Most task tools are built around workflows, categories, and projects. Over time, they become complex, fragmented, and mentally heavy. You end up managing the tool instead of your attention.
 
-Brightly solves this by treating everything as part of one system. There is one main list where all items live. Nothing gets buried in folders or boards. You do not move things around to make them feel organized. You simply change their focus state, reorder them, and filter the same list when you need a different perspective.
+Brightly solves this by treating everything as part of one system. There is one main list where all items live. Nothing gets buried in folders or boards. You do not move things around to make them feel organized. You simply change their focus state, reorder them, and filter the same list when you need a different perspective. Main point.. it doesn't care about deadlines or due dates. The only thing that matters is your prioritization. ⚡
 
-Brightly also uses a focus based status model instead of a progress model. An item can be waiting, in progress, current, or done. Only one item can ever be current at a time. When you make a new item current, the previous one is automatically moved to in progress. This keeps your attention honest and prevents silent multitasking ⚡
-
-The result is a calmer, clearer way to work, one that reflects how attention actually moves.
+I always stumble upon having a high priority item only to be them disturbed in the middle of it and having a new higher priority item. This forces you to focus on one thing AND ONE THING ONLY.
 
 **Stack and technical notes 🛠️**
 
