@@ -102,7 +102,13 @@ export function useItems({ includeDone = false, zoneId = null } = {}) {
       priority_order: index + 1,
     }));
 
-    setItems(updatedItems);
+    // Create a map of updated items by ID for quick lookup
+    const updatedItemsMap = new Map(updatedItems.map(item => [item.id, item]));
+
+    // Merge updated items back into the full items list
+    setItems(prev => prev.map(item => 
+      updatedItemsMap.has(item.id) ? updatedItemsMap.get(item.id) : item
+    ));
 
     // Persist
     const orderUpdates = updatedItems.map(item => ({
