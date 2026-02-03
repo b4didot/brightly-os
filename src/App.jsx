@@ -19,6 +19,7 @@ export default function App() {
   const [selectedZoneIds, setSelectedZoneIds] = useState([]);
   const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [addModalMode, setAddModalMode] = useState('full'); // 'fast' or 'full'
 
   // Zones state
   const { zones, loading: zonesLoading } = useZones();
@@ -79,8 +80,15 @@ export default function App() {
     await update(id, updates);
   }, [update]);
 
-  // Handle add button click
+  // Handle add button click (full add)
   const handleAddClick = useCallback(() => {
+    setAddModalMode('full');
+    setShowAddModal(true);
+  }, []);
+
+  // Handle fast add button click
+  const handleFastAddClick = useCallback(() => {
+    setAddModalMode('fast');
     setShowAddModal(true);
   }, []);
 
@@ -97,14 +105,15 @@ export default function App() {
   if (itemsLoading || zonesLoading) {
     return (
       <div className="app-layout">
-        <CommandArea 
-          zones={[]}
-          selectedZoneIds={[]}
-          selectedCategoryIds={[]}
-          onZoneFilterChange={() => {}}
-          onCategoryFilterChange={() => {}}
-          onAddClick={() => {}}
-        />
+      <CommandArea 
+        zones={[]}
+        selectedZoneIds={[]}
+        selectedCategoryIds={[]}
+        onZoneFilterChange={() => {}}
+        onCategoryFilterChange={() => {}}
+        onAddClick={() => {}}
+        onFastAddClick={() => {}}
+      />
         <div className="item-board-area" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           Loading...
         </div>
@@ -126,6 +135,7 @@ export default function App() {
           onZoneFilterChange={setSelectedZoneIds}
           onCategoryFilterChange={setSelectedCategoryIds}
           onAddClick={handleAddClick}
+          onFastAddClick={handleFastAddClick}
         />
         <div className="item-board-area" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444' }}>
           Error: {itemsError}
@@ -146,6 +156,7 @@ export default function App() {
         onZoneFilterChange={setSelectedZoneIds}
         onCategoryFilterChange={setSelectedCategoryIds}
         onAddClick={handleAddClick}
+        onFastAddClick={handleFastAddClick}
       />
       
       <ItemBoard
@@ -168,6 +179,7 @@ export default function App() {
       {showAddModal && (
         <AddItemModal
           zones={zones}
+          mode={addModalMode}
           onAdd={handleAddItem}
           onClose={() => setShowAddModal(false)}
         />
@@ -183,22 +195,40 @@ export default function App() {
  */
 import { CONTEXTS } from './lib/items';
 
-function AddItemModal({ zones, onAdd, onClose }) {
+function AddItemModal({ zones, mode = 'full', onAdd, onClose }) {
   const [title, setTitle] = useState('');
+  const [notes, setNotes] = useState('');
   const [context, setContext] = useState(CONTEXTS.OBJECTIVES);
   const [zoneId, setZoneId] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  const isFastMode = mode === 'fast';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim()) return;
 
     setSubmitting(true);
-    await onAdd({ 
-      title: title.trim(), 
-      context,
-      zone_id: zoneId || null,
-    });
+    const itemData = { 
+      title: title.trim(),
+    };
+
+    // Add notes for both modes if provided
+    if (notes.trim()) {
+      itemData.notes = notes.trim();
+    }
+
+    // Add category and zone only for full mode
+    if (!isFastMode) {
+      itemData.context = context;
+      itemData.zone_id = zoneId || null;
+    } else {
+      // Fast mode defaults to Objectives category
+      itemData.context = CONTEXTS.OBJECTIVES;
+      itemData.zone_id = null;
+    }
+
+    await onAdd(itemData);
     setSubmitting(false);
   };
 
@@ -207,7 +237,9 @@ function AddItemModal({ zones, onAdd, onClose }) {
       <div className="modal-overlay" onClick={onClose} />
       <div className="modal">
         <div className="modal__header">
-          <h2 className="modal__title">Add Item</h2>
+          <h2 className="modal__title">
+            {isFastMode ? 'Fast Add' : 'Add Item'}
+          </h2>
           <button className="modal__close" onClick={onClose}>✕</button>
         </div>
         
@@ -226,34 +258,53 @@ function AddItemModal({ zones, onAdd, onClose }) {
           </div>
 
           <div className="modal__field">
-            <label className="modal__label">Category</label>
-            <select 
-              className="modal__select"
-              value={context} 
-              onChange={(e) => setContext(e.target.value)}
+            <label className="modal__label">
+              {isFastMode ? 'Short Description (optional)' : 'Description (optional)'}
+            </label>
+            <textarea
+              className="modal__input"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder={isFastMode ? "Quick note..." : "Add details..."}
+              rows={isFastMode ? 2 : 3}
               disabled={submitting}
-            >
-              <option value={CONTEXTS.OBJECTIVES}>Objectives</option>
-              <option value={CONTEXTS.RESEARCH}>Research</option>
-              <option value={CONTEXTS.NEEDS}>Needs</option>
-              <option value={CONTEXTS.REMINDERS}>Reminders</option>
-            </select>
+              style={{ resize: 'vertical', fontFamily: 'inherit' }}
+            />
           </div>
 
-          <div className="modal__field">
-            <label className="modal__label">Zone (optional)</label>
-            <select 
-              className="modal__select"
-              value={zoneId} 
-              onChange={(e) => setZoneId(e.target.value)}
-              disabled={submitting}
-            >
-              <option value="">No Zone</option>
-              {zones.map(zone => (
-                <option key={zone.id} value={zone.id}>{zone.name}</option>
-              ))}
-            </select>
-          </div>
+          {!isFastMode && (
+            <>
+              <div className="modal__field">
+                <label className="modal__label">Category</label>
+                <select 
+                  className="modal__select"
+                  value={context} 
+                  onChange={(e) => setContext(e.target.value)}
+                  disabled={submitting}
+                >
+                  <option value={CONTEXTS.OBJECTIVES}>Objectives</option>
+                  <option value={CONTEXTS.RESEARCH}>Research</option>
+                  <option value={CONTEXTS.NEEDS}>Needs</option>
+                  <option value={CONTEXTS.REMINDERS}>Reminders</option>
+                </select>
+              </div>
+
+              <div className="modal__field">
+                <label className="modal__label">Zone (optional)</label>
+                <select 
+                  className="modal__select"
+                  value={zoneId} 
+                  onChange={(e) => setZoneId(e.target.value)}
+                  disabled={submitting}
+                >
+                  <option value="">No Zone</option>
+                  {zones.map(zone => (
+                    <option key={zone.id} value={zone.id}>{zone.name}</option>
+                  ))}
+                </select>
+              </div>
+            </>
+          )}
 
           <div className="modal__actions">
             <button 

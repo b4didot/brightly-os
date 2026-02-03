@@ -21,14 +21,18 @@ export function CommandArea({
   onZoneFilterChange,
   onCategoryFilterChange,
   onAddClick,
+  onFastAddClick,
 }) {
   return (
     <header className="command-area">
-      {/* Left side: Add button and filters */}
+      {/* Left side: Add buttons and filters */}
       <nav className="command-area__menu">
+        <button className="add-btn" onClick={onFastAddClick}>
+          Fast Add
+        </button>
+
         <button className="add-btn" onClick={onAddClick}>
-          <span className="add-btn__icon">+</span>
-          <span>Add</span>
+          Add
         </button>
 
         <FilterDropdown

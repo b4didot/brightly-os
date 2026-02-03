@@ -42,16 +42,24 @@ export function FilterDropdown({
 
   const hasSelection = selectedIds.length > 0;
 
+  // Get selected option names
+  const getSelectedNames = () => {
+    const selectedOptions = options.filter(opt => selectedIds.includes(opt.id));
+    return selectedOptions.map(opt => opt.name).join(', ');
+  };
+
+  const selectedNames = hasSelection ? getSelectedNames() : '';
+
   return (
     <div className="filter-dropdown" ref={dropdownRef}>
       <button 
         className={`filter-dropdown__trigger ${hasSelection ? 'filter-dropdown__trigger--active' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span>{label}</span>
-        {hasSelection && (
-          <span className="filter-dropdown__count">{selectedIds.length}</span>
-        )}
+        <span className="filter-dropdown__label-text">
+          {label}
+          {hasSelection && <span className="filter-dropdown__selected">: {selectedNames}</span>}
+        </span>
         <span className="filter-dropdown__chevron">▼</span>
       </button>
 
