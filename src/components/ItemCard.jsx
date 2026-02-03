@@ -10,14 +10,19 @@ export function ItemCard({
   item, 
   isSelected, 
   isCurrent,
+  isDragOver,
   onClick,
   onDragStart,
   onDragEnd,
+  onDragOver,
+  onDragLeave,
+  onDrop,
 }) {
   const classNames = [
     'item-card',
     isSelected && 'item-card--selected',
     isCurrent && 'item-card--current',
+    isDragOver && 'item-card--drag-over',
   ].filter(Boolean).join(' ');
 
   const handleDragStart = (e) => {
@@ -30,6 +35,18 @@ export function ItemCard({
     onDragEnd?.();
   };
 
+  const handleDragOver = (e) => {
+    onDragOver?.(e);
+  };
+
+  const handleDragLeave = (e) => {
+    onDragLeave?.(e);
+  };
+
+  const handleDrop = (e) => {
+    onDrop?.(e);
+  };
+
   return (
     <div 
       className={classNames}
@@ -37,6 +54,9 @@ export function ItemCard({
       draggable
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
     >
       <div className="item-card__title">
         {item.title}

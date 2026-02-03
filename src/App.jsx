@@ -29,6 +29,7 @@ export default function App() {
     loading: itemsLoading,
     error: itemsError,
     changeStatus,
+    reorder,
     update,
     add,
     reload,
@@ -67,6 +68,11 @@ export default function App() {
   const handleStatusChange = useCallback(async (id, newStatus) => {
     await changeStatus(id, newStatus);
   }, [changeStatus]);
+
+  // Handle item reorder
+  const handleItemReorder = useCallback(async (newOrder) => {
+    await reorder(newOrder);
+  }, [reorder]);
 
   // Handle item update from details panel
   const handleItemUpdate = useCallback(async (id, updates) => {
@@ -148,6 +154,7 @@ export default function App() {
         selectedItemId={selectedItemId}
         onItemClick={handleItemClick}
         onStatusChange={handleStatusChange}
+        onItemReorder={handleItemReorder}
       />
 
       <DetailsPanel
